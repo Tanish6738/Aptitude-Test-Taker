@@ -1,3 +1,4 @@
+"use client";   
 import React from 'react';
 import FormInput from '@/components/FormInput';
 import Button from '@/components/Button';
@@ -16,7 +17,7 @@ export default function ContactPage() {
         >
           <FormInput label="Name" name="name" required />
           <FormInput label="Email" name="email" type="email" required />
-          <FormInput label="Message" name="message" as="textarea" required />
+          <FormInput label="Message" name="message" as='textarea' required />
           <Button type="submit">Send</Button>
         </form>
       </div>
