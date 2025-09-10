@@ -4,8 +4,31 @@ import StatsCard from '@/components/StatsCard';
 import { analytics } from '@/mock/analytics';
 import { attempts } from '@/mock/attempts';
 import { tests } from '@/mock/tests';
+import { useUser } from '@clerk/nextjs';
+import { syncUser } from '@/lib/userSync';
 
 export default function DashboardPage() {
+  const { user, isSignedIn } = useUser();
+  React.useEffect(() => {
+    let canceled = false;
+    (async () => {
+      if (!isSignedIn || !user) return;
+      const email = user.primaryEmailAddress?.emailAddress || user.emailAddresses?.[0]?.emailAddress;
+      if (!email) return;
+      const name = user.fullName || [user.firstName, user.lastName].filter(Boolean).join(' ') || user.username || 'User';
+      const res = await syncUser({
+        clerkId: user.id,
+        email,
+        name,
+      });
+      if (!canceled && !res.ok) {
+        console.error('Failed to sync user:', res.error);
+      }
+    })();
+    return () => {
+      canceled = true;
+    };
+  }, [user, isSignedIn]);
   const recent = attempts.slice(0, 5);
   return (
     <main className="min-h-screen bg-gray-900 text-gray-50 p-6">
